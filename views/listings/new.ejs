@@ -7,17 +7,32 @@
   </head>
   <body>
     <form action="/listings" method="POST">
-      <input type="text" name="title" placeholder="Enter Title" />
+      <input type="text" name="listing[title]" placeholder="Enter Title" />
       <br /><br />
-      <textarea name="description" placeholder="Enter description"></textarea>
+      <textarea
+        name="listing[description]"
+        placeholder="Enter description"
+      ></textarea>
       <br /><br />
-      <input type="text" name="image" placeholder="Enter URL/Link of image" />
+      <input
+        type="text"
+        name="listing[image]"
+        placeholder="Enter URL/Link of image"
+      />
       <br /><br />
-      <input type="number" name="price" placeholder="Enter the Price" />
+      <input
+        type="number"
+        name="listing[price]"
+        placeholder="Enter the Price"
+      />
       <br /><br />
-      <input type="text" name="location" placeholder="Enter location" />
+      <input
+        type="text"
+        name="listing[location]"
+        placeholder="Enter location"
+      />
       <br /><br />
-      <input type="text" name="country" placeholder="Enter Country" />
+      <input type="text" name="listing[country]" placeholder="Enter Country" />
       <br /><br />
       <button>Add Listing</button>
     </form>
