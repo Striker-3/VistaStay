@@ -2,7 +2,12 @@
 <body>
   <div class="row">
     <div class="col-8 offset-2">
-      <form action="/listings" method="POST">
+      <form
+        action="/listings"
+        method="POST"
+        novalidate
+        class="needs-validation"
+      >
         <br /><br />
         <h3>Create a New Listing</h3>
         <div class="mb-3">
@@ -12,7 +17,9 @@
             name="listing[title]"
             placeholder="Enter Title"
             class="form-control"
+            required
           />
+          <div class="valid-feedback">Title looks Good</div>
         </div>
 
         <div class="mb-3">
@@ -21,7 +28,9 @@
             name="listing[description]"
             placeholder="Enter description"
             class="form-control"
+            required
           ></textarea>
+          <div class="invalid-feedback">Add a short description</div>
         </div>
 
         <div class="mb-3">
@@ -38,11 +47,12 @@
           <div class="mb-3 col-md-4">
             <label for="price" class="form-label">Price</label>
             <input
-              type="number"
               name="listing[price]"
               placeholder="Enter the Price"
               class="form-control"
+              required
             />
+            <div class="invalid-feedback">Price should be valid</div>
           </div>
 
           <div class="mb-3 col-md-8">
@@ -52,18 +62,22 @@
               name="listing[location]"
               placeholder="Enter location"
               class="form-control"
+              required
             />
+            <div class="invalid-feedback">Location should be valid</div>
           </div>
         </div>
 
         <div class="mb-3">
-          <label for="location" class="form-label">Country</label>
+          <label for="country" class="form-label">Country</label>
           <input
             type="text"
             name="listing[country]"
             placeholder="Enter Country"
             class="form-control"
+            required
           />
+          <div class="invalid-feedback">Country name should be valid</div>
         </div>
 
         <br /><br />
