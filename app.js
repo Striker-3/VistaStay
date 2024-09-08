@@ -5,6 +5,9 @@ const Listing = require("./models/listing");
 const path = require("path");
 const methodOverride = require("method-override");
 const ejsMate = require("ejs-mate");
+const wrapAsync = require("./utils/wrapAsync.js");
+const ExpressError = require("./utils/expressError.js");
+const listingSchema = require("listingSchema");
 
 const MONGO_URL = "mongodb://127.0.0.1:27017/VistaStay";
 
@@ -38,10 +41,13 @@ app.get("/", (req, res) => {
 
 // INDEX route
 
-app.get("/listings", async (req, res) => {
-  let allListings = await Listing.find({});
-  res.render("listings/index.ejs", { allListings });
-});
+app.get(
+  "/listings",
+  wrapAsync(async (req, res) => {
+    let allListings = await Listing.find({});
+    res.render("listings/index.ejs", { allListings });
+  })
+);
 
 // NEw Route
 app.get("/listings/new", (req, res) => {
@@ -49,68 +55,66 @@ app.get("/listings/new", (req, res) => {
 });
 
 // Show Route
-app.get("/listings/:id", async (req, res) => {
-  let { id } = req.params;
-  let listing = await Listing.findById(id);
-  res.render("listings/show.ejs", { listing });
-});
+app.get(
+  "/listings/:id",
+  wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    let listing = await Listing.findById(id);
+    res.render("listings/show.ejs", { listing });
+  })
+);
 
 // Posting , route
-app.post("/listings", async (req, res, next) => {
-  // let { title, description, image, price, location, country } = req.body;
-  // let newListing = new Listing({
-  //   title: title,
-  //   description: description,
-  //   image: image,
-  //   price: price,
-  //   location: location,
-  //   country: country,
-  // });
-  try {
+app.post(
+  "/listings",
+  wrapAsync(async (req, res, next) => {
+    if (!req.body.listing) {
+      throw new ExpressError(400, "Enter valid data in listing");
+    }
+    let result = listingSchema.validate(req.body);
     let newListing = new Listing(req.body.listing);
     await newListing.save();
     res.redirect("/listings");
-  } catch (err) {
-    next(err);
-  }
-});
+  })
+);
 
 // Edit Route
-app.get("/listings/:id/edit", async (req, res) => {
-  let { id } = req.params;
-  const listing = await Listing.findById(id);
-  res.render("listings/edit.ejs", { listing });
-});
+app.get(
+  "/listings/:id/edit",
+  wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    const listing = await Listing.findById(id);
+    res.render("listings/edit.ejs", { listing });
+  })
+);
 
-app.put("/listings/:id", async (req, res) => {
-  let { id } = req.params;
-  await Listing.findByIdAndUpdate(id, { ...req.body.listing });
-  res.redirect("/listings");
-});
+app.put(
+  "/listings/:id",
+  wrapAsync(async (req, res) => {
+    if (!req.body.listing) {
+      throw new ExpressError(400, "Enter valid data in listing");
+    }
+    let { id } = req.params;
+    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    res.redirect("/listings");
+  })
+);
 
 // Delete Route
-app.delete("/listings/:id", async (req, res) => {
-  let { id } = req.params;
-  await Listing.findByIdAndDelete(id);
-  res.redirect("/listings");
+app.delete(
+  "/listings/:id",
+  wrapAsync(async (req, res) => {
+    let { id } = req.params;
+    await Listing.findByIdAndDelete(id);
+    res.redirect("/listings");
+  })
+);
+
+app.all("*", (req, res, next) => {
+  next(new ExpressError(404, "Page not found"));
 });
 
 app.use((err, req, res, next) => {
-  res.send("Something went wrong");
+  let { status = 500, message = "Page Not Found" } = err;
+  res.status(status).render("error.ejs", { message });
 });
-
-// Test Route
-// app.get("/testListing", async (req, res) => {
-//   let sampleListing = new Listing({
-//     title: "Cozy Mountain Retreat",
-//     description:
-//       "A serene cabin nestled in the mountains, perfect for a peaceful getaway.",
-//     price: 1500,
-//     location: "Aspen, Colorado",
-//     country: "USA",
-//   });
-
-//   await sampleListing.save();
-//   console.log("Listing was saved");
-//   res.send("Successful testing");
-// });
